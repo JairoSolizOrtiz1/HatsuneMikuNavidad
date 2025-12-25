@@ -1,0 +1,608 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background: #0a0a1a;
+    color: white;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+    position: fixed;
+}
+
+.game-container {
+    width: 100%;
+    height: 100vh;
+    position: relative;
+}
+
+.screen {
+    display: none;
+    width: 100%;
+    height: 100vh;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.screen.active {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ========== PANTALLA DE INICIO ========== */
+#start-screen {
+    background: linear-gradient(180deg, #1a1a2e 0%, #0f3460 50%, #1a1a2e 100%);
+}
+
+.title-container {
+    text-align: center;
+    animation: fadeIn 1s ease-in;
+    z-index: 10;
+}
+
+.title-container h1 {
+    font-size: 2.5rem;
+    margin: 20px 0 10px;
+    text-shadow: 0 0 20px rgba(64, 224, 208, 0.8);
+    animation: glow 2s ease-in-out infinite alternate;
+}
+
+.subtitle {
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+    opacity: 0.9;
+}
+
+.instruction {
+    font-size: 0.9rem;
+    margin-bottom: 30px;
+    color: #ffd93d;
+    font-weight: bold;
+}
+
+.btn {
+    padding: 15px 40px;
+    font-size: 1.2rem;
+    background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+    border: none;
+    border-radius: 30px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+    font-weight: bold;
+}
+
+.btn:active {
+    transform: scale(0.95);
+}
+
+/* ========== PERSONAJE MIKU (GIF) ========== */
+.miku-character {
+    position: relative;
+    margin: 0 auto 20px;
+    transform-origin: center bottom;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.miku-character.idle {
+    width: 150px;
+    height: 200px;
+}
+
+.miku-character.game {
+    position: absolute;
+    bottom: 15%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+    width: 120px;
+    height: 160px;
+}
+
+.miku-character.victory {
+    width: 180px;
+    height: 240px;
+    margin-bottom: 30px;
+}
+
+.miku-gif {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    image-rendering: auto;
+    pointer-events: none;
+    filter: drop-shadow(0 4px 15px rgba(64, 224, 208, 0.5));
+}
+
+/* Animaciones del personaje */
+.miku-character.idle {
+    animation: idleBounce 2s ease-in-out infinite;
+}
+
+.miku-character.celebrating {
+    animation: celebrate 1s ease-in-out infinite;
+}
+
+.miku-character.game.idle {
+    animation: idleBounceGame 2s ease-in-out infinite;
+}
+
+.miku-character.victory.celebrating {
+    animation: celebrate 1s ease-in-out infinite;
+}
+
+@keyframes idleBounce {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-5px) scale(1.02); }
+}
+
+@keyframes idleBounceGame {
+    0%, 100% { transform: translateX(-50%) translateY(0) scale(1); }
+    50% { transform: translateX(-50%) translateY(-5px) scale(1.02); }
+}
+
+@keyframes celebrate {
+    0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+    25% { transform: translateY(-10px) rotate(-5deg) scale(1.05); }
+    75% { transform: translateY(-10px) rotate(5deg) scale(1.05); }
+}
+
+/* ========== PANTALLA DE JUEGO ========== */
+#game-screen {
+    background: linear-gradient(180deg, #0a0a1a 0%, #1a1a2e 50%, #0a0a1a 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.game-background {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+
+.stage {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 30%;
+    background: linear-gradient(180deg, rgba(15, 52, 96, 0.3) 0%, rgba(26, 26, 46, 0.8) 100%);
+    border-top: 2px solid rgba(64, 224, 208, 0.3);
+}
+
+.snow-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.snowflake-bg {
+    position: absolute;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 1rem;
+    animation: snowFall linear infinite;
+}
+
+@keyframes snowFall {
+    from {
+        top: -20px;
+        transform: translateX(0) rotate(0deg);
+    }
+    to {
+        top: 100vh;
+        transform: translateX(50px) rotate(360deg);
+    }
+}
+
+.game-header {
+    width: 100%;
+    padding: 15px 20px;
+    z-index: 10;
+    position: relative;
+    background: rgba(10, 10, 26, 0.7);
+    backdrop-filter: blur(5px);
+}
+
+.time-progress {
+    margin-bottom: 10px;
+}
+
+.time-bar {
+    width: 100%;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 5px;
+}
+
+.time-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #40e0d0, #00ced1);
+    width: 0%;
+    transition: width 0.1s linear;
+    box-shadow: 0 0 10px rgba(64, 224, 208, 0.6);
+}
+
+.time-text {
+    text-align: center;
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.stats {
+    display: flex;
+    justify-content: space-around;
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.accuracy {
+    color: #ffd93d;
+}
+
+.combo {
+    color: #40e0d0;
+}
+
+.game-area {
+    flex: 1;
+    width: 100%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+}
+
+/* Círculo central de hit */
+.hit-circle {
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    border: 4px solid #ffd93d;
+    border-radius: 50%;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 6;
+    box-shadow: 0 0 30px rgba(255, 217, 61, 0.8), inset 0 0 20px rgba(255, 217, 61, 0.3);
+    animation: pulse 1s ease-in-out infinite;
+    pointer-events: none;
+}
+
+.hit-circle-inner {
+    width: 100%;
+    height: 100%;
+    border: 2px solid rgba(255, 217, 61, 0.5);
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+@keyframes pulse {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.8; }
+}
+
+/* Campo de notas */
+.notes-field {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 3;
+    pointer-events: none;
+}
+
+/* Notas circulares que convergen */
+.note {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff6b6b, #ffd93d);
+    border: 3px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 0 20px rgba(255, 215, 61, 0.6), inset 0 0 15px rgba(255, 255, 255, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    cursor: pointer;
+    pointer-events: auto;
+    z-index: 4;
+    transition: transform 0.1s;
+    overflow: hidden;
+}
+
+.note-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.note:active {
+    transform: scale(0.9);
+}
+
+.note.perfect {
+    background: linear-gradient(135deg, #6bcf7f, #4ecdc4);
+    box-shadow: 0 0 30px rgba(110, 207, 127, 0.8);
+    animation: noteHit 0.3s ease-out;
+}
+
+.note.good {
+    background: linear-gradient(135deg, #ffd93d, #ffb347);
+    box-shadow: 0 0 25px rgba(255, 217, 61, 0.7);
+    animation: noteHit 0.3s ease-out;
+}
+
+.note.miss {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+    opacity: 0.5;
+    animation: noteMiss 0.5s ease-out;
+}
+
+@keyframes noteHit {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(0); opacity: 0; }
+}
+
+@keyframes noteMiss {
+    0% { transform: scale(1); }
+    100% { transform: scale(0.5); opacity: 0; }
+}
+
+/* Feedback visual */
+.feedback {
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 3rem;
+    font-weight: bold;
+    z-index: 20;
+    pointer-events: none;
+    text-shadow: 0 0 20px currentColor;
+}
+
+.feedback.perfect {
+    color: #6bcf7f;
+    animation: feedbackPop 0.5s ease-out;
+}
+
+.feedback.good {
+    color: #ffd93d;
+    animation: feedbackPop 0.5s ease-out;
+}
+
+.feedback.miss {
+    color: #ff6b6b;
+    animation: feedbackPop 0.5s ease-out;
+}
+
+@keyframes feedbackPop {
+    0% { transform: translateX(-50%) scale(0); opacity: 0; }
+    50% { transform: translateX(-50%) scale(1.2); opacity: 1; }
+    100% { transform: translateX(-50%) scale(1) translateY(-50px); opacity: 0; }
+}
+
+/* ========== PANTALLA GAME OVER ========== */
+#gameover-screen {
+    background: linear-gradient(135deg, #1a1a2e 0%, #0f3460 100%);
+}
+
+.gameover-container {
+    text-align: center;
+    animation: fadeIn 0.5s ease-in;
+}
+
+.gameover-container h1 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: #ff6b6b;
+}
+
+.gameover-container p {
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+    opacity: 0.9;
+}
+
+/* ========== PANTALLA DE VICTORIA ========== */
+#victory-screen {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.victory-background {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+
+.snowflakes {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+}
+
+.snowflake {
+    position: absolute;
+    font-size: 2rem;
+    animation: snowfall linear infinite;
+    opacity: 0.8;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.snowflake:nth-child(1) { left: 10%; animation-duration: 10s; animation-delay: 0s; }
+.snowflake:nth-child(2) { left: 30%; animation-duration: 12s; animation-delay: 2s; }
+.snowflake:nth-child(3) { left: 50%; animation-duration: 14s; animation-delay: 4s; }
+.snowflake:nth-child(4) { left: 70%; animation-duration: 11s; animation-delay: 1s; }
+.snowflake:nth-child(5) { left: 90%; animation-duration: 13s; animation-delay: 3s; }
+.snowflake:nth-child(6) { left: 20%; animation-duration: 15s; animation-delay: 5s; }
+
+.victory-container {
+    text-align: center;
+    z-index: 10;
+    position: relative;
+    animation: fadeIn 1s ease-in;
+    padding: 20px;
+}
+
+.victory-title {
+    font-size: 2.5rem;
+    margin: 20px 0;
+    text-shadow: 0 0 30px rgba(255, 255, 255, 0.8);
+    animation: glow 2s ease-in-out infinite alternate;
+}
+
+.message-box {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 30px 20px;
+    border-radius: 20px;
+    margin: 20px;
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    min-height: 200px;
+}
+
+.special-message {
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    color: #ffd93d;
+    font-weight: bold;
+    min-height: 2.5rem;
+}
+
+.love-message {
+    font-size: 2.2rem;
+    margin-bottom: 20px;
+    color: #ff6b6b;
+    font-weight: bold;
+    min-height: 2.8rem;
+}
+
+.personal-message {
+    font-size: 1.3rem;
+    line-height: 1.8;
+    opacity: 0.95;
+    color: #40e0d0;
+    min-height: 4rem;
+}
+
+/* Animación de texto letra por letra */
+.typing {
+    border-right: 2px solid currentColor;
+    animation: blink 0.8s step-end infinite;
+}
+
+@keyframes blink {
+    0%, 50% { border-color: transparent; }
+    51%, 100% { border-color: currentColor; }
+}
+
+/* Animaciones generales */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes glow {
+    from { text-shadow: 0 0 20px rgba(255, 255, 255, 0.5); }
+    to { text-shadow: 0 0 40px rgba(255, 215, 61, 0.8), 0 0 60px rgba(255, 107, 107, 0.6); }
+}
+
+@keyframes snowfall {
+    from {
+        top: -50px;
+        transform: translateX(0) rotate(0deg);
+    }
+    to {
+        top: 100vh;
+        transform: translateX(50px) rotate(360deg);
+    }
+}
+
+/* Responsive para móviles */
+@media (max-width: 768px) {
+    .title-container h1 {
+        font-size: 2rem;
+    }
+
+    .victory-title {
+        font-size: 2rem;
+    }
+
+    .miku-character.idle {
+        width: 120px;
+        height: 160px;
+    }
+
+    .miku-character.game {
+        width: 100px;
+        height: 130px;
+    }
+
+    .miku-character.victory {
+        width: 150px;
+        height: 200px;
+    }
+
+    .hit-circle {
+        width: 100px;
+        height: 100px;
+    }
+
+    .note {
+        width: 50px;
+        height: 50px;
+        font-size: 1.2rem;
+    }
+
+    .feedback {
+        font-size: 2.5rem;
+    }
+
+    .special-message {
+        font-size: 1.5rem;
+    }
+
+    .love-message {
+        font-size: 1.8rem;
+    }
+
+    .personal-message {
+        font-size: 1.1rem;
+    }
+}
